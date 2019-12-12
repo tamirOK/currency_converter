@@ -1,0 +1,7 @@
+celery==4.3.0
+coverage==4.5.4
+Django==2.2.8
+djangorestframework==3.10.3
+redis==3.3.11
+responses==0.10.7
+psycopg2-binary==2.8.4

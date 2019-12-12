@@ -1,0 +1,57 @@
+version: '2.1'
+
+services:
+  web:
+    container_name: web
+    ports:
+      - '8000:8000'
+    build: .
+    volumes:
+      - ./currency_converter:/currency_converter
+    restart: always
+    command: bash -c "
+      python manage.py makemigrations &&
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000
+      "
+    depends_on:
+      postgres:
+        condition: service_healthy
+  celery:
+    build: .
+    hostname: celery
+    container_name: celery
+    command: celery -A currency_converter worker -B -l info
+    volumes:
+      - ./currency_converter:/currency_converter
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+  postgres:
+    image: postgres:12.1
+    hostname: postgres
+    container_name: postgres
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres -h localhost"]
+      retries: 10
+    restart: always
+  redis:
+    image: redis:5.0
+    hostname: redis
+    container_name: redis
+  test:
+    container_name: test
+    build: .
+    depends_on:
+      web:
+        condition: service_started
+    volumes:
+      - ./currency_converter:/currency_converter
+    command: bash -c "
+      coverage run --source='.' manage.py test &&
+      coverage html"
