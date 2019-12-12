@@ -7,7 +7,7 @@ celery worker/beat are left unconfigured for the sake of simplicity
 
 
 #### How to test and measure coverage
-Run `docker-compose --rm test` for testing. Open `currency_converter/htmlcov/index.html`
+Run `docker-compose run --rm test` for testing. Open `currency_converter/htmlcov/index.html`
 to see coverage results
 
 #### How to run
